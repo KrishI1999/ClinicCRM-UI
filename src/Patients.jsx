@@ -39,8 +39,7 @@ function Patients() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = response.data;
-        setPatients(Array.isArray(data) ? data : data.$values ?? data.patients ?? data.data ?? []);
-
+       setPatients(response.data.$values ?? []);
         console.log("Fetched patients:", response.data);
       } catch (error) {
         console.error("Error fetching patients:", error);
