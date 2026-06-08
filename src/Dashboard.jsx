@@ -178,7 +178,7 @@ const Dashboard = () => {
                         onClick={() => navigate("/visits")}
                         className="inline-block mt-4 text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline"
                     >
-                        View All Visits →
+                        View All Visits → hello
                     </button>
                 </div>
 
