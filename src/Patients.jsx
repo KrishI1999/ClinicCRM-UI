@@ -39,7 +39,7 @@ function Patients() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = response.data;
-        setPatients(Array.isArray(data) ? data : data.patients ?? data.data ?? []);
+        setPatients(Array.isArray(data) ? data : data.$values ?? data.patients ?? data.data ?? []);
 
         console.log("Fetched patients:", response.data);
       } catch (error) {
