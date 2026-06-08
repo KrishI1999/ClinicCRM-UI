@@ -38,7 +38,10 @@ function Patients() {
           "https://cliniccrm-kvlv.onrender.com/api/patients",
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        setPatients(response.data);
+        const data = response.data;
+        setPatients(Array.isArray(data) ? data : data.patients ?? data.data ?? []);
+
+        console.log("Fetched patients:", response.data);
       } catch (error) {
         console.error("Error fetching patients:", error);
       } finally {
@@ -48,7 +51,7 @@ function Patients() {
     fetchPatients();
   }, []);
 
-  const filteredPatients = patients.filter((patient) => {
+  const filteredPatients = (Array.isArray(patients) ? patients : []).filter((patient) => {
     const query = searchQuery.toLowerCase();
     return (
       patient.name?.toLowerCase().includes(query) ||
@@ -177,9 +180,8 @@ function Patients() {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                            avatarColors[(indexOfFirst + index) % avatarColors.length]
-                          }`}
+                          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${avatarColors[(indexOfFirst + index) % avatarColors.length]
+                            }`}
                         >
                           {getInitials(patient.name)}
                         </div>
@@ -195,13 +197,12 @@ function Patients() {
 
                     <td className="px-5 py-4">
                       <span
-                        className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                          patient.gender === "Male"
-                            ? "bg-blue-50 text-blue-700"
-                            : patient.gender === "Female"
+                        className={`px-2.5 py-1 rounded-full text-xs font-medium ${patient.gender === "Male"
+                          ? "bg-blue-50 text-blue-700"
+                          : patient.gender === "Female"
                             ? "bg-pink-50 text-pink-700"
                             : "bg-gray-100 text-gray-500"
-                        }`}
+                          }`}
                       >
                         {patient.gender || "—"}
                       </span>
@@ -290,11 +291,10 @@ function Patients() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition ${
-                      page === currentPage
-                        ? "bg-blue-600 text-white shadow-sm"
-                        : "text-gray-500 hover:bg-gray-100"
-                    }`}
+                    className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition ${page === currentPage
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "text-gray-500 hover:bg-gray-100"
+                      }`}
                   >
                     {page}
                   </button>
