@@ -12,7 +12,7 @@ function Login() {
 
     try {
       const resp = await axios.post(
-        "https://localhost:5001/api/auth/login",
+        "https://cliniccrm-kvlv.onrender.com/api/auth/login",
         {
           email,
           password,

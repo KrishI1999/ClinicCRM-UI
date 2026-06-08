@@ -35,7 +35,7 @@ const Dashboard = () => {
                 const token = localStorage.getItem("token");
 
                 const response = await axios.get(
-                    "https://localhost:5001/api/visits",
+                    "https://cliniccrm-kvlv.onrender.com/api/visits",
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -71,7 +71,7 @@ const Dashboard = () => {
                 const token = localStorage.getItem("token");
 
                 const response = await axios.get(
-                    "https://localhost:5001/api/patients",
+                    "https://cliniccrm-kvlv.onrender.com/api/patients",
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,

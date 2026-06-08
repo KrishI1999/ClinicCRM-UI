@@ -29,7 +29,7 @@ function AddPayment({ visitId, patientId, onClose, onSuccess }) {
             const token = localStorage.getItem("token");
 
             await axios.post(
-                "https://localhost:5001/api/payments",
+                "https://cliniccrm-kvlv.onrender.com/api/payments",
                 {
                     patientId,
                     visitId,

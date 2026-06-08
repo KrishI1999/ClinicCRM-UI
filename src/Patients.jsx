@@ -19,7 +19,7 @@ function Patients() {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://localhost:5001/api/patients/${id}`, {
+      await axios.delete(`https://cliniccrm-kvlv.onrender.com/api/patients/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPatients((prev) => prev.filter((p) => p.id !== id));
@@ -35,7 +35,7 @@ function Patients() {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          "https://localhost:5001/api/patients",
+          "https://cliniccrm-kvlv.onrender.com/api/patients",
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setPatients(response.data);

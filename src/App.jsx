@@ -15,6 +15,7 @@ import AllVisits from './AllVisits'
 import Revenue from './Revenue'
 import UserDashboard from './UserDashboard'
 import ProtectedRoute from './ProtectedRoute'
+import Subscription from './Subscription'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -68,6 +69,10 @@ function App() {
               <Revenue />
             </ProtectedRoute>
           } />
+          <Route
+            path="/subscription"
+            element={<Subscription />}
+          />
 
           <Route path="/unauthorized" element={<div>403 - Access Denied</div>} />
           <Route path="*" element={<Navigate to="/" replace />} />

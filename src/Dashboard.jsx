@@ -25,31 +25,31 @@ const Dashboard = () => {
         navigate("/");
     };
 
-   useEffect(() => {
-    const fetchPayments = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            const response = await axios.get(
-                "https://localhost:5001/api/payments",
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+    useEffect(() => {
+        const fetchPayments = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get(
+                    "https://cliniccrm-kvlv.onrender.com/api/payments",
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
 
-            const data = response.data;
+                const data = response.data;
 
-            const revenue = data.reduce((total, payment) => total + payment.paidAmount, 0);
+                const revenue = data.reduce((total, payment) => total + payment.paidAmount, 0);
 
-            setRevenue(revenue);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
+                setRevenue(revenue);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    fetchPayments();
-}, []);
+        fetchPayments();
+    }, []);
 
-   
+
 
     useEffect(() => {
         const fetchVisits = async () => {
@@ -57,7 +57,7 @@ const Dashboard = () => {
                 const token = localStorage.getItem("token");
 
                 const response = await axios.get(
-                    "https://localhost:5001/api/visits",
+                    "https://cliniccrm-kvlv.onrender.com/api/visits",
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -93,7 +93,7 @@ const Dashboard = () => {
                 const token = localStorage.getItem("token");
 
                 const response = await axios.get(
-                    "https://localhost:5001/api/patients",
+                    "https://cliniccrm-kvlv.onrender.com/api/patients",
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -125,6 +125,12 @@ const Dashboard = () => {
                     <p className="text-gray-500 text-sm mt-1">
                         Welcome back! Here's what's happening today.
                     </p>
+                    <button
+                        onClick={() => navigate("/subscription", { replace: true })}
+                        className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
+                    >
+                        Subscribe 👑 
+                    </button>
                 </div>
 
                 <button
@@ -150,7 +156,7 @@ const Dashboard = () => {
                         {patients}
                     </p>
                     <button
-                        onClick={() => navigate("/patients",{ replace: true })}
+                        onClick={() => navigate("/patients", { replace: true })}
                         className="inline-block mt-4 text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline"
                     >
                         View Patients →
@@ -185,7 +191,7 @@ const Dashboard = () => {
                         <span className="text-2xl">💰</span>
                     </div>
                     <p className="text-4xl font-extrabold text-purple-600">
-                       {revenue.toLocaleString()}
+                        {revenue.toLocaleString()}
                     </p>
                     <button
                         onClick={() => navigate("/revenue")}
