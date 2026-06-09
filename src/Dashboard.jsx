@@ -27,7 +27,7 @@ const Dashboard = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     localStorage.removeItem("tokenExpiry"); // ✅ add this
-    navigate("/");
+    navigate("/login");
 };
 
     useEffect(() => {
