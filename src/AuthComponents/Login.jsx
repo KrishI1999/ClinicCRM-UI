@@ -22,9 +22,11 @@ function Login() {
 
       const jwtToken = resp.data.token;
       const role = resp.data.user.role;
+      
 
       localStorage.setItem("token", jwtToken);
       localStorage.setItem("role", role);
+      localStorage.setItem("tokenExpiry", Date.now() + 60 * 60 * 1000);
 
       if (role === "Admin") {
         navigate("/dashboard", { replace: true });

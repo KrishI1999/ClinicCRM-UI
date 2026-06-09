@@ -24,9 +24,11 @@ const Dashboard = () => {
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
 
     const logout = () => {
-        localStorage.removeItem("token");
-        navigate("/");
-    };
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("tokenExpiry"); // ✅ add this
+    navigate("/");
+};
 
     useEffect(() => {
         const fetchPayments = async () => {
