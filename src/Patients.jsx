@@ -39,7 +39,7 @@ function Patients() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = response.data;
-       setPatients(response.data.$values ?? []);
+        setPatients(response.data.$values ?? []);
         console.log("Fetched patients:", response.data);
       } catch (error) {
         console.error("Error fetching patients:", error);
@@ -309,10 +309,13 @@ function Patients() {
               </div>
             </div>
           )}
-          
+
         </div>
-         <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"><a href="/dashboard">🏠
-          Back to Dashboard</a>
+        <button
+          onClick={() => navigate('/userdashboard')}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
+        >
+          🏠 Back to Dashboard
         </button>
       </div>
     </div>
