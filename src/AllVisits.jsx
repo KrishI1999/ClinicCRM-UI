@@ -5,13 +5,10 @@ import AddPayment from "./AddComponents/AddPayment";
 
 function AllVisits() {
     const { id } = useParams();
-
     const [visits, setVisits] = useState([]);
     const [loading, setLoading] = useState(true);
-
     const [showPayment, setShowPayment] = useState(false);
     const [selectedVisit, setSelectedVisit] = useState(null);
-
     const [fromDate, setFromDate] = useState("");
     const [toDate, setToDate] = useState("");
     const [isFiltered, setIsFiltered] = useState(false);
@@ -26,7 +23,8 @@ function AllVisits() {
                     "https://cliniccrm-kvlv.onrender.com/api/visits",
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-                setVisits(response.data);
+                const data = response.data.$values || response.data || [];
+                setVisits(data);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -329,11 +327,10 @@ function AllVisits() {
                                 <button
                                     key={page}
                                     onClick={() => setCurrentPage(page)}
-                                    className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition ${
-                                        page === currentPage
+                                    className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition ${page === currentPage
                                             ? "bg-blue-600 text-white shadow-sm"
                                             : "text-gray-500 hover:bg-gray-100"
-                                    }`}
+                                        }`}
                                 >
                                     {page}
                                 </button>

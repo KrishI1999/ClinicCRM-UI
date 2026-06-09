@@ -1,12 +1,10 @@
 import React from "react";
 import AddUser from "./AddComponents/AddUser";
-import CreateUser from "./CreateComponents/CreateUser";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AddPatient from "./AddComponents/AddPatient";
 import axios from "axios";
 import AddVisit from "./AddComponents/AddVisit";
-import Revenue from "./Revenue";
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -14,7 +12,7 @@ const Dashboard = () => {
     const [visits, setVisits] = useState([]);
     const [todayVisits, setTodayVisits] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [patients, setPatients] = useState(0);
+    const [patients, setPatients] = useState([]);
     const [showCreateUser, setShowCreateUser] = useState(false);
     const [showCreatePatient, setShowCreatePatient] = useState(false);
     const [showCreateVisit, setShowCreateVisit] = useState(false);
@@ -26,83 +24,72 @@ const Dashboard = () => {
     };
 
     useEffect(() => {
-        const fetchPayments = async () => {
-            try {
-                const token = localStorage.getItem("token");
-                const response = await axios.get(
-                    "https://cliniccrm-kvlv.onrender.com/api/payments",
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
+    const fetchPayments = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get(
+                "https://cliniccrm-kvlv.onrender.com/api/payments",
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
 
-                const data = response.data;
+            // ✅ FIX: unwrap $values
+            const data = response.data.$values || response.data || [];
+            const revenue = data.reduce((total, payment) => total + payment.paidAmount, 0);
+            setRevenue(revenue);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-                const revenue = data.reduce((total, payment) => total + payment.paidAmount, 0);
-
-                setRevenue(revenue);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchPayments();
-    }, []);
-
-
+    fetchPayments();
+}, []);
 
     useEffect(() => {
-        const fetchVisits = async () => {
-            try {
-                const token = localStorage.getItem("token");
+    const fetchVisits = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get(
+                "https://cliniccrm-kvlv.onrender.com/api/visits",
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
 
-                const response = await axios.get(
-                    "https://cliniccrm-kvlv.onrender.com/api/visits",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
+            // ✅ FIX: unwrap $values
+            const data = response.data.$values || response.data || [];
+            setVisits(data);
+
+            const count = data.filter((visit) => {
+                const visitDate = new Date(visit.visitDate);
+                const today = new Date();
+                return (
+                    visitDate.getDate() === today.getDate() &&
+                    visitDate.getMonth() === today.getMonth() &&
+                    visitDate.getFullYear() === today.getFullYear()
                 );
+            }).length;
 
-                setVisits(response.data);
+            setTodayVisits(count);
+        } catch (error) {
+            console.error("Error fetching visits:", error);
+        }
+    };
 
-                const count = response.data.filter((visit) => {
-                    const visitDate = new Date(visit.visitDate);
-                    const today = new Date();
-
-                    return (
-                        visitDate.getDate() === today.getDate() &&
-                        visitDate.getMonth() === today.getMonth() &&
-                        visitDate.getFullYear() === today.getFullYear()
-                    );
-                }).length;
-
-                setTodayVisits(count);
-            } catch (error) {
-                console.error("Error fetching visits:", error);
-            }
-        };
-
-        fetchVisits();
-    }, []);
+    fetchVisits();
+}, []);
 
     useEffect(() => {
         const fetchPatients = async () => {
             try {
                 const token = localStorage.getItem("token");
-
                 const response = await axios.get(
                     "https://cliniccrm-kvlv.onrender.com/api/patients",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
+                    { headers: { Authorization: `Bearer ${token}` } }
                 );
 
-                console.log("Patients fetched:", response.data.length);
-                setPatients(response.data.length);
+                // ✅ FIX: API returns { $values: [...] }, not a plain array
+                const list = response.data.$values || response.data || [];
+                setPatients(list);
             } catch (error) {
                 console.error("Error fetching patients:", error);
             } finally {
@@ -125,12 +112,7 @@ const Dashboard = () => {
                     <p className="text-gray-500 text-sm mt-1">
                         Welcome back! Here's what's happening today.
                     </p>
-                    <button
-                        onClick={() => navigate("/subscription", { replace: true })}
-                        className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
-                    >
-                        Subscribe 👑 
-                    </button>
+                    {/* ✅ REMOVED: Subscribe button (Subscription feature removed) */}
                 </div>
 
                 <button
@@ -152,11 +134,13 @@ const Dashboard = () => {
                         </h3>
                         <span className="text-2xl">🧑‍⚕️</span>
                     </div>
+                    {/* ✅ FIX: was patients (number), now patients.length (array) */}
                     <p className="text-4xl font-extrabold text-blue-600">
-                        {patients}
+                        {loading ? "..." : patients.length}
                     </p>
+                    {/* ✅ FIX: navigate() without replace:true so back button works */}
                     <button
-                        onClick={() => navigate("/patients", { replace: true })}
+                        onClick={() => navigate("/patients")}
                         className="inline-block mt-4 text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline"
                     >
                         View Patients →
@@ -178,7 +162,8 @@ const Dashboard = () => {
                         onClick={() => navigate("/visits")}
                         className="inline-block mt-4 text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline"
                     >
-                        View All Visits → hello
+                        {/* ✅ FIX: removed stray "hello" from button text */}
+                        View All Visits →
                     </button>
                 </div>
 
@@ -191,7 +176,7 @@ const Dashboard = () => {
                         <span className="text-2xl">💰</span>
                     </div>
                     <p className="text-4xl font-extrabold text-purple-600">
-                        {revenue.toLocaleString()}
+                        ₹{revenue.toLocaleString("en-IN")}
                     </p>
                     <button
                         onClick={() => navigate("/revenue")}
@@ -207,7 +192,6 @@ const Dashboard = () => {
                 <h2 className="text-lg font-bold text-gray-700 mb-4 uppercase tracking-wide">
                     ⚡ Quick Actions
                 </h2>
-
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <button
                         onClick={() => setShowCreateUser(true)}
@@ -215,14 +199,12 @@ const Dashboard = () => {
                     >
                         <span className="text-lg">👤</span> Create User
                     </button>
-
                     <button
                         onClick={() => setShowCreatePatient(true)}
                         className="flex items-center justify-center gap-2 bg-green-600 text-white px-5 py-3 rounded-xl hover:bg-green-700 shadow transition font-medium"
                     >
                         <span className="text-lg">🧑‍⚕️</span> Create Patient
                     </button>
-
                     <button
                         onClick={() => setShowCreateVisit(true)}
                         className="flex items-center justify-center gap-2 bg-purple-600 text-white px-5 py-3 rounded-xl hover:bg-purple-700 shadow transition font-medium"
@@ -232,16 +214,14 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Modals — untouched */}
+            {/* Modals */}
             {showCreateUser && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 relative">
                         <button
                             onClick={() => setShowCreateUser(false)}
                             className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl"
-                        >
-                            ✕
-                        </button>
+                        >✕</button>
                         <h2 className="text-2xl font-bold mb-6">Create New User</h2>
                         <AddUser onClose={() => setShowCreateUser(false)} />
                     </div>
@@ -254,9 +234,7 @@ const Dashboard = () => {
                         <button
                             onClick={() => setShowCreatePatient(false)}
                             className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl"
-                        >
-                            ✕
-                        </button>
+                        >✕</button>
                         <AddPatient onClose={() => setShowCreatePatient(false)} />
                     </div>
                 </div>
@@ -268,9 +246,7 @@ const Dashboard = () => {
                         <button
                             onClick={() => setShowCreateVisit(false)}
                             className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl"
-                        >
-                            ✕
-                        </button>
+                        >✕</button>
                         <AddVisit onClose={() => setShowCreateVisit(false)} />
                     </div>
                 </div>

@@ -15,7 +15,7 @@ function AddVisit({ onClose }) {
 
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
-   
+
 
     useEffect(() => {
         const fetchPatients = async () => {
@@ -30,8 +30,12 @@ function AddVisit({ onClose }) {
                         },
                     }
                 );
-
-                setPatients(response.data);
+                console.log("Fetched patients:", response.data);
+                setPatients(
+                    Array.isArray(response.data)
+                        ? response.data
+                        : response.data.$values || []
+                );
             } catch (error) {
                 console.error(error);
             }

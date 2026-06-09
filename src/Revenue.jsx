@@ -17,7 +17,8 @@ function Revenue() {
                     "https://cliniccrm-kvlv.onrender.com/api/payments",
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-                setPayments(response.data);
+                const data = response.data.$values || response.data || [];
+                setPayments(data);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -30,21 +31,21 @@ function Revenue() {
 
     const filteredPayments = isFiltered && fromDate && toDate
         ? payments.filter((p) => {
-              const date = new Date(p.createdAt);
-              const from = new Date(fromDate);
-              const to = new Date(toDate);
-              to.setHours(23, 59, 59, 999);
-              return date >= from && date <= to;
-          })
+            const date = new Date(p.createdAt);
+            const from = new Date(fromDate);
+            const to = new Date(toDate);
+            to.setHours(23, 59, 59, 999);
+            return date >= from && date <= to;
+        })
         : payments;
 
     // Stats
-    const totalBilled    = filteredPayments.reduce((sum, p) => sum + p.amount, 0);
+    const totalBilled = filteredPayments.reduce((sum, p) => sum + p.amount, 0);
     const totalCollected = filteredPayments.reduce((sum, p) => sum + p.paidAmount, 0);
-    const totalPending   = filteredPayments.reduce((sum, p) => sum + p.pendingAmount, 0);
-    const paidCount      = filteredPayments.filter((p) => p.status === "Paid").length;
-    const partialCount   = filteredPayments.filter((p) => p.status === "Partial").length;
-    const unpaidCount    = filteredPayments.filter((p) => p.status === "Unpaid").length;
+    const totalPending = filteredPayments.reduce((sum, p) => sum + p.pendingAmount, 0);
+    const paidCount = filteredPayments.filter((p) => p.status === "Paid").length;
+    const partialCount = filteredPayments.filter((p) => p.status === "Partial").length;
+    const unpaidCount = filteredPayments.filter((p) => p.status === "Unpaid").length;
 
     const handleApplyFilter = () => {
         if (fromDate && toDate) setIsFiltered(true);
@@ -209,13 +210,12 @@ function Revenue() {
                                         </td>
                                         <td className="p-3">
                                             <span
-                                                className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                                                    payment.status === "Paid"
+                                                className={`px-2 py-1 rounded-lg text-xs font-medium ${payment.status === "Paid"
                                                         ? "bg-green-100 text-green-700"
                                                         : payment.status === "Partial"
-                                                        ? "bg-yellow-100 text-yellow-700"
-                                                        : "bg-red-100 text-red-700"
-                                                }`}
+                                                            ? "bg-yellow-100 text-yellow-700"
+                                                            : "bg-red-100 text-red-700"
+                                                    }`}
                                             >
                                                 {payment.status}
                                             </span>
@@ -233,6 +233,9 @@ function Revenue() {
                     )}
                 </div>
             </div>
+            <button className="flex items-center mt-4 gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"><a href="/dashboard">🏠
+          Back to Dashboard</a>
+        </button>
         </div>
     );
 }
