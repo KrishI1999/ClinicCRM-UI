@@ -1,9 +1,10 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 function PatientVisits() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [visits, setVisits] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -17,8 +18,18 @@ function PatientVisits() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        console.log(response.data, "Visits fetched for patient ID:", id);
-        setVisits(response.data);
+        // Unwrap top-level $values
+        const data = response.data.$values || response.data || [];
+
+        // Unwrap any nested $values on each visit (e.g. visit.payments, visit.items etc.)
+        const normalized = data.map((visit) => ({
+          ...visit,
+          payment: visit.payment?.$values
+            ? visit.payment.$values[0] ?? null
+            : visit.payment ?? null,
+        }));
+
+        setVisits(normalized);
       } catch (error) {
         console.error(error);
       } finally {
@@ -59,22 +70,15 @@ function PatientVisits() {
         {/* Header */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <div className="flex items-center gap-4">
-
-            {/* Avatar */}
             <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
-              {patientName
-                ? patientName.charAt(0).toUpperCase()
-                : "P"}
+              {patientName ? patientName.charAt(0).toUpperCase() : "P"}
             </div>
-
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
                 {patientName ? `${patientName}'s Visits` : "Patient Visits"}
               </h1>
               <div className="flex items-center gap-3 mt-1">
-                <span className="text-sm text-gray-400">
-                  Patient ID: {id}
-                </span>
+                <span className="text-sm text-gray-400">Patient ID: {id}</span>
                 {!loading && (
                   <>
                     <span className="text-gray-200">|</span>
@@ -121,23 +125,21 @@ function PatientVisits() {
                 {/* Visit Header */}
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
-
-                    {/* Visit Number Badge */}
                     <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-sm flex-shrink-0">
                       {visits.length - index}
                     </div>
-
                     <div>
                       <p className="font-semibold text-gray-800">
                         Visit #{visit.id}
                       </p>
                       <p className="text-xs text-gray-400">
-                        {index === 0 ? "Latest visit" : `Visit ${visits.length - index} of ${visits.length}`}
+                        {index === 0
+                          ? "Latest visit"
+                          : `Visit ${visits.length - index} of ${visits.length}`}
                       </p>
                     </div>
                   </div>
 
-                  {/* Date */}
                   <div className="text-right">
                     <p className="text-sm font-medium text-gray-600">
                       {visit.visitDate
@@ -159,7 +161,6 @@ function PatientVisits() {
                   </div>
                 </div>
 
-                {/* Divider */}
                 <div className="border-t border-gray-50 mb-4" />
 
                 {/* Case & Advice */}
@@ -172,7 +173,6 @@ function PatientVisits() {
                       {visit.case || "No case details available"}
                     </p>
                   </div>
-
                   <div className="bg-slate-50 rounded-xl p-3">
                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">
                       Medical Advice
@@ -195,7 +195,6 @@ function PatientVisits() {
                         </span>
                       )}
                     </div>
-
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <span>
                         Billed:{" "}
@@ -216,6 +215,15 @@ function PatientVisits() {
             );
           })}
         </div>
+
+        {/* ✅ FIX: proper back button using navigate(-1) instead of <a href> */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
+        >
+          ← Back
+        </button>
+
       </div>
     </div>
   );
