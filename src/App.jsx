@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 // Lazy load all route components
+const LandingPage   = lazy(() => import('./LandingPage'))
 const Login        = lazy(() => import('./AuthComponents/Login'))
 const Register     = lazy(() => import('./AuthComponents/Register'))
 const Dashboard    = lazy(() => import('./Dashboard'))
@@ -27,7 +28,7 @@ function App() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* Public routes */}
-          <Route path="/"        element={<Login />} />
+           <Route path="/"          element={<LandingPage />} />
           <Route path="/login"   element={<Login />} />
           <Route path="/register" element={<Register />} />
 
