@@ -14,7 +14,11 @@ function AddUser({ onClose }) {
     const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const value = e.target.name === "email"
+            ? e.target.value.toLowerCase()
+            : e.target.value;
+
+        setForm({ ...form, [e.target.name]: value });
         setError("");
     };
 
@@ -23,6 +27,21 @@ function AddUser({ onClose }) {
 
         if (!form.name || !form.email || !form.password || !form.role) {
             setError("All fields are required.");
+            return;
+        }
+
+        if (form.email !== form.email.toLowerCase()) {
+            setError("Email must be in lowercase.");
+            return;
+        }
+
+        if (form.password.length < 8) {
+            setError("Password must be at least 8 characters.");
+            return;
+        }
+
+        if (form.password.length > 12) {
+            setError("Password must not exceed 12 characters.");
             return;
         }
 
@@ -120,7 +139,8 @@ function AddUser({ onClose }) {
                             name="password"
                             value={form.password}
                             onChange={handleChange}
-                            placeholder="Min. 6 characters"
+                            placeholder="Min. 8 characters, max. 12"
+                            maxLength={12}
                             className="w-full px-4 py-2.5 pr-10 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
                         />
                         <button
@@ -131,6 +151,16 @@ function AddUser({ onClose }) {
                             {showPassword ? "🙈" : "👁️"}
                         </button>
                     </div>
+                    {/* ✅ Live character counter */}
+                    <p className={`text-xs mt-1 text-right ${
+                        form.password.length > 0 && form.password.length < 8
+                            ? "text-red-400"
+                            : form.password.length >= 8
+                            ? "text-emerald-500"
+                            : "text-gray-400"
+                    }`}>
+                        {form.password.length}/12 characters
+                    </p>
                 </div>
 
                 {/* Role */}
@@ -163,7 +193,6 @@ function AddUser({ onClose }) {
                     </p>
                 </div>
 
-                {/* Divider */}
                 <div className="border-t border-gray-100 pt-2" />
 
                 {/* Actions */}

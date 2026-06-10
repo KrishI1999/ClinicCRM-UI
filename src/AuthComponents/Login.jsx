@@ -13,6 +13,11 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    // ✅ Email must be lowercase
+    if (email !== email.toLowerCase()) {
+      setError("Email must be in lowercase.");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -23,7 +28,7 @@ function Login() {
 
       const jwtToken = resp.data.token;
       const role = resp.data.user.role;
-      
+
 
       localStorage.setItem("token", jwtToken);
       localStorage.setItem("role", role);
@@ -75,8 +80,8 @@ function Login() {
               placeholder="doctor@clinic.com"
               value={email}
               onChange={(e) => {
-                setEmail(e.target.value);
-                setError(""); // clear error on edit
+                setEmail(e.target.value.toLowerCase()); // ✅ force lowercase
+                setError("");
               }}
               required
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
