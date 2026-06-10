@@ -56,10 +56,34 @@ function Login() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
 
         {/* Title */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-700">Clinic CRM</h1>
-          <p className="text-gray-500 mt-2">Sign in to continue</p>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center">
+            <svg
+              className="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422A12.083 12.083 0 0112 20.055a12.083 12.083 0 01-6.16-9.477L12 14z"
+              />
+            </svg>
+          </div>
+
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Clinic CRM
+            </h1>
+            <p className="text-sm text-gray-400">
+              Sign in to continue
+            </p>
+          </div>
         </div>
+
+        <div className="border-t border-gray-100 mb-6" />
 
         {/* Error Block */}
         {error && (

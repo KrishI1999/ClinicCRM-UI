@@ -16,21 +16,14 @@ function AddVisit({ onClose }) {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
 
-
     useEffect(() => {
         const fetchPatients = async () => {
             try {
                 const token = localStorage.getItem("token");
-
                 const response = await axios.get(
                     "https://cliniccrm-kvlv.onrender.com/api/patients",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
+                    { headers: { Authorization: `Bearer ${token}` } }
                 );
-                console.log("Fetched patients:", response.data);
                 setPatients(
                     Array.isArray(response.data)
                         ? response.data
@@ -40,7 +33,6 @@ function AddVisit({ onClose }) {
                 console.error(error);
             }
         };
-
         fetchPatients();
     }, []);
 
@@ -50,12 +42,7 @@ function AddVisit({ onClose }) {
 
     const selectPatient = (patient) => {
         setSearch(patient.name);
-
-        setVisit((prev) => ({
-            ...prev,
-            patientId: patient.id,
-        }));
-
+        setVisit((prev) => ({ ...prev, patientId: patient.id }));
         setShowDropdown(false);
     };
 
@@ -63,7 +50,7 @@ function AddVisit({ onClose }) {
         e.preventDefault();
 
         if (!visit.patientId) {
-            setMessage("❌ Please select a patient");
+            setMessage("error:Please select a patient from the list.");
             return;
         }
 
@@ -81,181 +68,177 @@ function AddVisit({ onClose }) {
                     case: visit.case,
                     advice: visit.advice,
                 },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            setMessage("✅ Visit created successfully");
-
+            setMessage("success:Visit created successfully.");
             setVisit({
                 patientId: "",
                 visitDate: new Date().toISOString().slice(0, 16),
                 case: "",
                 advice: "",
             });
-
             setSearch("");
             setShowDropdown(false);
 
-            // Close popup after success (optional)
-            setTimeout(() => {
-                if (onClose) onClose();
-            }, 1000);
+            setTimeout(() => { if (onClose) onClose(); }, 1000);
 
         } catch (error) {
-            console.error(error.response?.data || error.message);
-
-            setMessage(
-                error.response?.data?.message ||
-                "❌ Failed to create visit"
-            );
+            setMessage(`error:${error.response?.data?.message || "Failed to create visit."}`);
         } finally {
             setLoading(false);
         }
     };
 
+    const isError = message.startsWith("error:");
+    const isSuccess = message.startsWith("success:");
+    const messageText = message.replace(/^(error|success):/, "");
+
+    const inputClass = "w-full border border-gray-200 bg-gray-50 rounded-xl px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 transition";
+    const labelClass = "block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5";
+
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <h2 className="text-2xl font-bold text-gray-800">
-                Add Visit
-            </h2>
+        <div className="space-y-5">
+
+            {/* Header */}
+            <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 className="text-xl font-bold text-gray-900">Add Visit</h2>
+                    <p className="text-sm text-gray-400">Record a new patient visit</p>
+                </div>
+            </div>
+
+            <div className="border-t border-gray-100" />
 
             {/* Message */}
             {message && (
-                <div className="p-3 rounded-lg bg-gray-100 text-gray-700">
-                    {message}
+                <div className={`px-4 py-3 rounded-xl text-sm flex items-center gap-2 border ${
+                    isSuccess
+                        ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                        : "bg-red-50 border-red-200 text-red-700"
+                }`}>
+                    <span>{isSuccess ? "✅" : "⚠️"}</span>
+                    {messageText}
                 </div>
             )}
 
-            {/* Patient Search */}
-            <div className="relative">
-                <label className="block mb-2 font-medium">
-                    Patient Name
-                </label>
+            <form onSubmit={handleSubmit} className="space-y-4">
 
-                <input
-                    type="text"
-                    placeholder="Search patient..."
-                    value={search}
-                    onFocus={() => setShowDropdown(true)}
-                    onChange={(e) => {
-                        setSearch(e.target.value);
-                        setShowDropdown(true);
+                {/* Patient Search */}
+                <div className="relative">
+                    <label className={labelClass}>Patient</label>
+                    <input
+                        type="text"
+                        placeholder="Search by patient name..."
+                        value={search}
+                        onFocus={() => setShowDropdown(true)}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            setShowDropdown(true);
+                            setVisit((prev) => ({ ...prev, patientId: "" }));
+                        }}
+                        className={inputClass}
+                    />
+                    {/* Selected indicator */}
+                    {visit.patientId && (
+                        <p className="text-xs text-emerald-600 mt-1.5 font-medium">✓ Patient selected</p>
+                    )}
 
-                        setVisit((prev) => ({
-                            ...prev,
-                            patientId: "",
-                        }));
-                    }}
-                    className="w-full border rounded-lg p-3"
-                />
-
-                {showDropdown && search && (
-                    <div className="absolute z-50 w-full border rounded-lg mt-1 max-h-48 overflow-y-auto bg-white shadow-lg">
-                        {filteredPatients.length > 0 ? (
-                            filteredPatients.map((patient) => (
-                                <div
-                                    key={patient.id}
-                                    onClick={() => selectPatient(patient)}
-                                    className="p-3 cursor-pointer hover:bg-gray-100"
-                                >
-                                    <div className="font-medium">
+                    {showDropdown && search && (
+                        <div className="absolute z-50 w-full border border-gray-200 rounded-xl mt-1 max-h-48 overflow-y-auto bg-white shadow-lg">
+                            {filteredPatients.length > 0 ? (
+                                filteredPatients.map((patient) => (
+                                    <div
+                                        key={patient.id}
+                                        onClick={() => selectPatient(patient)}
+                                        className="px-4 py-2.5 cursor-pointer hover:bg-blue-50 text-sm text-gray-700 hover:text-blue-700 transition flex items-center gap-2"
+                                    >
+                                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                                            {patient.name.charAt(0).toUpperCase()}
+                                        </div>
                                         {patient.name}
                                     </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="p-3 text-gray-500">
-                                No patients found
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
+                                ))
+                            ) : (
+                                <div className="px-4 py-3 text-sm text-gray-400">No patients found</div>
+                            )}
+                        </div>
+                    )}
+                </div>
 
-            {/* Visit Date */}
-            <div>
-                <label className="block mb-2 font-medium">
-                    Visit Date
-                </label>
+                {/* Visit Date */}
+                <div>
+                    <label className={labelClass}>Visit Date & Time</label>
+                    <input
+                        type="datetime-local"
+                        value={visit.visitDate}
+                        onChange={(e) => setVisit((prev) => ({ ...prev, visitDate: e.target.value }))}
+                        className={inputClass}
+                    />
+                </div>
 
-                <input
-                    type="datetime-local"
-                    value={visit.visitDate}
-                    onChange={(e) =>
-                        setVisit((prev) => ({
-                            ...prev,
-                            visitDate: e.target.value,
-                        }))
-                    }
-                    className="w-full border rounded-lg p-3"
-                />
-            </div>
+                {/* Case Details */}
+                <div>
+                    <label className={labelClass}>Case Details</label>
+                    <textarea
+                        rows="3"
+                        placeholder="Describe the patient's condition..."
+                        value={visit.case}
+                        onChange={(e) => setVisit((prev) => ({ ...prev, case: e.target.value }))}
+                        className={inputClass + " resize-none"}
+                    />
+                </div>
 
-            {/* Notes */}
-            <div>
-                <label className="block mb-2 font-medium">
-                    Case Details
-                </label>
+                {/* Medical Advice */}
+                <div>
+                    <label className={labelClass}>Medical Advice</label>
+                    <textarea
+                        rows="3"
+                        placeholder="Enter prescribed advice or treatment..."
+                        value={visit.advice}
+                        onChange={(e) => setVisit((prev) => ({ ...prev, advice: e.target.value }))}
+                        className={inputClass + " resize-none"}
+                    />
+                </div>
 
-                <textarea
-                    rows="4"
-                    placeholder="Enter case details..."
-                    value={visit.case}
-                    onChange={(e) =>
-                        setVisit((prev) => ({
-                            ...prev,
-                            case: e.target.value,
-                        }))
-                    }
-                    className="w-full border rounded-lg p-3"
-                />
-            </div>
+                <div className="border-t border-gray-100 pt-2" />
 
-            {/* Advice */}
-            <div>
-                <label className="block mb-2 font-medium">
-                    Medical Advice
-                </label>
-
-                <textarea
-                    rows="4"
-                    placeholder="Enter medical advice..."
-                    value={visit.advice}
-                    onChange={(e) =>
-                        setVisit((prev) => ({
-                            ...prev,
-                            advice: e.target.value,
-                        }))
-                    }
-                    className="w-full border rounded-lg p-3"
-                />
-            </div>
-
-            {/* Buttons */}
-            <div className="flex gap-3">
-                {onClose && (
+                {/* Actions */}
+                <div className="flex gap-3">
+                    {onClose && (
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-gray-200 text-gray-500 hover:bg-gray-50 transition"
+                        >
+                            Cancel
+                        </button>
+                    )}
                     <button
-                        type="button"
-                        onClick={onClose}
-                        className="flex-1 bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600"
+                        type="submit"
+                        disabled={loading}
+                        className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
                     >
-                        Cancel
+                        {loading ? (
+                            <>
+                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                </svg>
+                                Creating Visit...
+                            </>
+                        ) : (
+                            "Add Visit"
+                        )}
                     </button>
-                )}
-
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:bg-blue-300"
-                >
-                    {loading ? "Creating Visit..." : "Add Visit"}
-                </button>
-            </div>
-        </form>
+                </div>
+            </form>
+        </div>
     );
 }
 

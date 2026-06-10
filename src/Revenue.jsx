@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Revenue() {
     const [payments, setPayments] = useState([]);
@@ -8,6 +9,8 @@ function Revenue() {
     const [fromDate, setFromDate] = useState("");
     const [toDate, setToDate] = useState("");
     const [isFiltered, setIsFiltered] = useState(false);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchPayments = async () => {
@@ -233,9 +236,14 @@ function Revenue() {
                     )}
                 </div>
             </div>
-            <button className="flex items-center mt-4 gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"><a href="/dashboard">🏠
-          Back to Dashboard</a>
-        </button>
+           <div className="flex justify-center mt-5">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
+                >
+                    ← Back
+                </button>
+            </div>
         </div>
     );
 }
