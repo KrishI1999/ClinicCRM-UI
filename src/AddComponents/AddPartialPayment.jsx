@@ -158,5 +158,9 @@ function AddPartialPayment({ paymentId, pendingAmount, onClose, onSuccess }) {
         </form>
     );
 }
+//function
+
+
+
 
 export default AddPartialPayment;
