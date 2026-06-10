@@ -2,7 +2,8 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import AddPayment from "./AddComponents/AddPayment";
-import AddPartialPayment from "./AddComponents/AddPartialPayment";
+import AddPartialPayment from "./AddComponents/AddpartialPayment";
+import {  useNavigate } from "react-router-dom";
 
 function AllVisits() {
     const { id } = useParams();
@@ -15,6 +16,9 @@ function AllVisits() {
     const [isFiltered, setIsFiltered] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const visitsPerPage = 5;
+
+    const navigate = useNavigate();
+    
 
     const fetchVisits = async () => {
         try {
