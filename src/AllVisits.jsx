@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import AddPayment from "./AddComponents/AddPayment";
-import AddPartialPayment from "./AddComponents/AddpartialPayment";
+import AddPartialPayment from "./AddComponents/AddPartialPayment";
 import {  useNavigate } from "react-router-dom";
 
 function AllVisits() {
