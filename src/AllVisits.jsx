@@ -335,9 +335,8 @@ function AllVisits() {
                                 <button
                                     key={page}
                                     onClick={() => setCurrentPage(page)}
-                                    className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition ${
-                                        page === currentPage ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:bg-gray-100"
-                                    }`}
+                                    className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition ${page === currentPage ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:bg-gray-100"
+                                        }`}
                                 >
                                     {page}
                                 </button>
@@ -388,6 +387,14 @@ function AllVisits() {
                         </div>
                     </div>
                 )}
+            </div>
+            <div className="flex justify-center mt-5">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
+                >
+                    ← Back
+                </button>
             </div>
         </div>
     );
