@@ -14,7 +14,7 @@ const loadSubscription = async () => {
     const token = localStorage.getItem("token");
 
     const res = await axios.get(
-      "https://localhost:5001/api/subscription/current",
+      "https://cliniccrm-kvlv.onrender.com/api/subscription/current",
       {
         headers: {
           Authorization: `Bearer ${token}`,

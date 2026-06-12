@@ -50,7 +50,7 @@ function AddUser({ onClose }) {
             const token = localStorage.getItem("token");
 
             await axios.post(
-                "https://localhost:5001/api/users",
+                "https://cliniccrm-kvlv.onrender.com/api/users",
                 {
                     name: form.name,
                     email: form.email,

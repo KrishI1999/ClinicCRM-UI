@@ -17,7 +17,7 @@ function Revenue() {
             try {
                 const token = localStorage.getItem("token");
                 const response = await axios.get(
-                    "https://localhost:5001/api/payments",
+                    "https://cliniccrm-kvlv.onrender.com/api/payments",
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 const data = response.data.$values || response.data || [];

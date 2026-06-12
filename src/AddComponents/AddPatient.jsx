@@ -28,7 +28,7 @@ function AddPatient({ onClose }) {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "https://localhost:5001/api/patients",
+        "https://cliniccrm-kvlv.onrender.com/api/patients",
         patient,
         { headers: { Authorization: `Bearer ${token}` } }
       );
