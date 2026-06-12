@@ -54,7 +54,7 @@ function Register() {
     try {
       setLoading(true);
       const payload = { ...formData, phone: `+91${formData.phone}` };
-      await axios.post("https://localhost:5001/api/auth/register-clinic", payload);
+      await axios.post("https://cliniccrm-kvlv.onrender.com/api/auth/register-clinic", payload);
       setSuccess(true);
       setTimeout(() => navigate("/login", { replace: true }), 2000);
     } catch (err) {

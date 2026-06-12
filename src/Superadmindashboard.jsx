@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const BASE_URL = "https://localhost:5001/api";
+const BASE_URL = "https://cliniccrm-kvlv.onrender.com/api";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const fmt = (n) => (n ?? 0).toLocaleString("en-IN");

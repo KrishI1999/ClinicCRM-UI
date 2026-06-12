@@ -32,7 +32,7 @@ const Dashboard = () => {
             setDismissLoadingId(visit.id);
             const token = localStorage.getItem("token");
             await axios.put(
-                `https://localhost:5001/api/visits/${visit.id}`,
+                `https://cliniccrm-kvlv.onrender.com/api/visits/${visit.id}`,
                 {
                     patientId: visit.patientId,
                     visitDate: visit.visitDate,
@@ -73,7 +73,7 @@ const Dashboard = () => {
             try {
                 const token = localStorage.getItem("token");
                 const response = await axios.get(
-                    "https://localhost:5001/api/visits",
+                    "https://cliniccrm-kvlv.onrender.com/api/visits",
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 const data = response.data.$values || response.data || [];
@@ -118,7 +118,7 @@ const Dashboard = () => {
             try {
                 const token = localStorage.getItem("token");
                 const response = await axios.get(
-                    "https://localhost:5001/api/payments",
+                    "https://cliniccrm-kvlv.onrender.com/api/payments",
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 const data = response.data.$values || response.data || [];
@@ -138,7 +138,7 @@ const Dashboard = () => {
             try {
                 const token = localStorage.getItem("token");
                 const response = await axios.get(
-                    "https://localhost:5001/api/patients",
+                    "https://cliniccrm-kvlv.onrender.com/api/patients",
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 const list = response.data.$values || response.data || [];
@@ -159,7 +159,7 @@ const Dashboard = () => {
             setUsersLoading(true);
             const token = localStorage.getItem("token");
             const response = await axios.get(
-                "https://localhost:5001/api/users",
+                "https://cliniccrm-kvlv.onrender.com/api/users",
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             const data = response.data.$values || response.data || [];
@@ -177,7 +177,7 @@ const Dashboard = () => {
             setDeleteLoadingId(id);
             const token = localStorage.getItem("token");
             await axios.delete(
-                `https://localhost:5001/api/users/${id}`,
+                `https://cliniccrm-kvlv.onrender.com/api/users/${id}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setUsers((prev) => prev.filter((u) => u.id !== id));

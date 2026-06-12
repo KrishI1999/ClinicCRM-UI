@@ -33,7 +33,7 @@ function AddPartialPayment({ paymentId, pendingAmount, onClose, onSuccess }) {
             const token = localStorage.getItem("token");
 
             await axios.post(
-                `https://localhost:5001/api/payments/${paymentId}/partial`,
+                `https://cliniccrm-kvlv.onrender.com/api/payments/${paymentId}/partial`,
                 {
                     paidAmount: Number(form.paidAmount),
                     paymentMethod: form.paymentMethod,
