@@ -24,7 +24,7 @@ function AllVisits() {
         try {
             const token = localStorage.getItem("token");
             const response = await axios.get(
-                "https://cliniccrm-kvlv.onrender.com/api/visits",
+                "https://localhost:5001/api/visits",
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             const data = response.data.$values || response.data || [];

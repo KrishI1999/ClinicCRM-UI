@@ -22,7 +22,7 @@ function Login() {
 
     try {
       const resp = await axios.post(
-        "https://cliniccrm-kvlv.onrender.com/api/auth/login",
+        "https://localhost:5001/api/auth/login",
         { email, password }
       );
 
@@ -36,8 +36,10 @@ function Login() {
 
       if (role === "Admin") {
         navigate("/dashboard", { replace: true });
-      } else {
+      } else if (role === "Staff") {
         navigate("/userdashboard", { replace: true });
+      } else if (role === "SuperAdmin") {
+        navigate("/superadmin", { replace: true });
       }
     } catch (error) {
       // Show message from API if available, else a fallback

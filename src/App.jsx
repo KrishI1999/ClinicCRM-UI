@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import SuperAdminDashboard from './Superadmindashboard'
 
 // Lazy load all route components
 const LandingPage   = lazy(() => import('./LandingPage'))
@@ -49,6 +50,12 @@ function App() {
           <Route path="/userdashboard" element={
             <ProtectedRoute allowedRoles={['Staff']}>
               <UserDashboard />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/superadmin" element={
+            <ProtectedRoute allowedRoles={['SuperAdmin']}>
+              <SuperAdminDashboard/>
             </ProtectedRoute>
           } />
 
