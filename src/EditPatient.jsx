@@ -20,7 +20,7 @@ function EditPatient() {
         const token = localStorage.getItem("token");
 
         const response = await axios.get(
-          `https://cliniccrm-kvlv.onrender.com/api/patients/${id}`,
+          `https://localhost:5001/api/patients/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -51,7 +51,7 @@ function EditPatient() {
       const token = localStorage.getItem("token");
 
       await axios.put(
-        `https://cliniccrm-kvlv.onrender.com/api/patients/${id}`,
+        `https://localhost:5001/api/patients/${id}`,
         patient,
         {
           headers: {
