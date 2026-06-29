@@ -1,5 +1,5 @@
 import react from "react";
-import AddPatient from "./AddPatient";
+import AddPatient from "../AddComponents/AddPatient";
 
 const CreatePatient = () => {
   return (
