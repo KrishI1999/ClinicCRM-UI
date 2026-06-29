@@ -1,10 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
 function AddVisit({ onClose }) {
     const [patients, setPatients] = useState([]);
     const [search, setSearch] = useState("");
     const [showDropdown, setShowDropdown] = useState(false);
+
+    // NEW: track whether past illness was auto-filled from history
+    const [illnessLoadedFromHistory, setIllnessLoadedFromHistory] = useState(false);
+    const [loadingHistory, setLoadingHistory] = useState(false);
+    // Ref mirror of the "active" patient id — refs update synchronously,
+    // so an in-flight request can check this and know immediately if the
+    // user has since switched to a different patient.
+    const activeHistoryPatientIdRef = useRef(null);
 
     // Replace this helper at the top of your component
     const getLocalDateTime = () => {
@@ -55,10 +63,93 @@ function AddVisit({ onClose }) {
         p.name.toLowerCase().includes(search.toLowerCase())
     );
 
+    // Helper: PastIllnessJson can come back as a JSON string ("[\"Diabetes\"]")
+    // or, depending on EF serialization, already as an array. Handle both safely.
+    const parsePastIllness = (raw) => {
+        if (!raw) return [];
+        if (Array.isArray(raw)) return raw;
+        try {
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch {
+            return [];
+        }
+    };
+
+    // Fetch this patient's visit history and pull past illness from the
+    // most recent visit that actually has illness data recorded.
+    const loadPastIllnessForPatient = async (patientId) => {
+        if (!patientId) return;
+
+        try {
+            setLoadingHistory(true);
+            const token = localStorage.getItem("token");
+            const response = await axios.get(
+                `https://cliniccrm-kvlv.onrender.com/api/visits/patient/${patientId}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            // If the user has already switched to a different patient while
+            // this request was in flight, discard the result — it belongs
+            // to the previous selection and must not overwrite the new one.
+            if (patientId !== activeHistoryPatientIdRef.current) return;
+
+            // Backend uses ReferenceHandler.Preserve, so the array is wrapped
+            // as { $id, $values: [...] } just like the /api/patients response.
+            const visits = Array.isArray(response.data)
+                ? response.data
+                : response.data.$values || [];
+
+            if (visits.length === 0) return; // first-time patient, nothing to load
+
+            // Backend already orders by VisitDate descending, but sort
+            // defensively in case that ever changes.
+            const sorted = [...visits].sort(
+                (a, b) => new Date(b.visitDate) - new Date(a.visitDate)
+            );
+
+            // A visit may legitimately have been saved with an empty
+            // pastIllness (e.g. a follow-up where nothing new was noted).
+            // Carry forward the most recent NON-EMPTY illness list instead
+            // of only checking the single latest visit, so a blank follow-up
+            // doesn't wipe out previously recorded illness history.
+            let illnesses = [];
+            for (const v of sorted) {
+                const parsed = parsePastIllness(v.pastIllnessJson ?? v.pastIllness);
+                if (parsed.length > 0) {
+                    illnesses = parsed;
+                    break;
+                }
+            }
+
+            if (illnesses.length > 0) {
+                setVisit((prev) => ({ ...prev, pastIllness: illnesses }));
+                setIllnessLoadedFromHistory(true);
+            }
+        } catch (error) {
+            console.error("Failed to load patient history:", error);
+            // Fail silently here — worst case the user just types it in manually,
+            // we don't want a history-fetch error to block adding a visit.
+        } finally {
+            if (patientId === activeHistoryPatientIdRef.current) {
+                setLoadingHistory(false);
+            }
+        }
+    };
+
     const selectPatient = (patient) => {
         setSearch(patient.name);
-        setVisit((prev) => ({ ...prev, patientId: patient.id }));
         setShowDropdown(false);
+
+        // Mark this patient as the "active" one for history purposes,
+        // and immediately clear any previous patient's illness data so
+        // stale info is never shown while the new fetch is in flight.
+        activeHistoryPatientIdRef.current = patient.id;
+        setIllnessLoadedFromHistory(false);
+
+        setVisit((prev) => ({ ...prev, patientId: patient.id, pastIllness: [] }));
+
+        loadPastIllnessForPatient(patient.id);
     };
 
     const addTablet = () => {
@@ -78,6 +169,8 @@ function AddVisit({ onClose }) {
         if (!illnessInput.trim()) return;
         setVisit((prev) => ({ ...prev, pastIllness: [...prev.pastIllness, illnessInput.trim()] }));
         setIllnessInput("");
+        // Once the user touches the list manually it's no longer purely "from history"
+        setIllnessLoadedFromHistory(false);
     };
 
     const removeIllness = (index) => {
@@ -117,6 +210,7 @@ function AddVisit({ onClose }) {
                 followUpDate: "", followUpNotes: "", referredBy: "", pastIllness: [],
             });
             setSearch("");
+            setIllnessLoadedFromHistory(false);
             setTimeout(() => { if (onClose) onClose(); }, 1000);
         } catch (error) {
             setMessage(`error:${error.response?.data?.message || "Failed to create visit."}`);
@@ -250,7 +344,15 @@ function AddVisit({ onClose }) {
                             />
                         </div>
                         <div>
-                            <label className={labelClass}>Past Illness</label>
+                            <div className="flex items-center justify-between mb-1.5">
+                                <label className={labelClass + " mb-0"}>Past Illness</label>
+                                {loadingHistory && (
+                                    <span className="text-xs text-gray-400">Loading history...</span>
+                                )}
+                                {!loadingHistory && illnessLoadedFromHistory && (
+                                    <span className="text-xs text-blue-500 font-medium">↺ Loaded from previous visit</span>
+                                )}
+                            </div>
                             <div className="flex gap-2">
                                 <input
                                     type="text"
@@ -273,7 +375,7 @@ function AddVisit({ onClose }) {
                                     {visit.pastIllness.map((illness, i) => (
                                         <span key={i} className="flex items-center gap-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium px-2.5 py-1 rounded-full">
                                             {illness}
-                                            <button type="button" onClick={() => removeIllness(i)} className="text-emerald-400 hover:text-red-500 transition font-bold">×</button>
+                                            <button type="button" onClick={() => { removeIllness(i); setIllnessLoadedFromHistory(false); }} className="text-emerald-400 hover:text-red-500 transition font-bold">×</button>
                                         </span>
                                     ))}
                                 </div>
